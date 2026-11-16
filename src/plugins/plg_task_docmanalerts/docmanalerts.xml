@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="plugin" group="task" method="upgrade">
+    <name>PLG_TASK_DOCMANALERTS</name>
+    <version>1.0.0</version>
+    <author>Kunena Team</author>
+    <license>GNU General Public License version 3 or later</license>
+    <description>PLG_TASK_DOCMANALERTS_DESCRIPTION</description>
+    <namespace path="src">Kunena\Plugin\Task\DocmanAlerts</namespace>
+    <files>
+        <folder plugin="docmanalerts">services</folder>
+        <folder>src</folder>
+        <folder>language</folder>
+    </files>
+    <scriptfile>script.php</scriptfile>
+</extension>

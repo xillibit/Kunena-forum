@@ -1,0 +1,13 @@
+# DOCman expiration alerts
+
+This is a standalone Joomla 6 task plugin, not part of the Kunena package. Create an installable ZIP with the contents of this directory at its root, install it in Joomla, and enable the **Task - DOCman expiration alerts** plugin. In System > Scheduled Tasks, create and enable a **DOCman expiration alerts** task, preferably scheduled daily. Configure Joomla's scheduler execution mechanism and mail transport.
+
+DOCman must already be installed on MySQL/MariaDB, and `#__docman_documents` must use InnoDB. The installer adds nullable `DATETIME` columns `alert_90_sent` and `alert_30_sent` if missing, and creates `#__docman_alert_deliveries` for per-user delivery tracking. Existing columns and data are retained on update and uninstall; the database user needs permission to alter and create tables. Back up the database before installing.
+
+The task uses the UTC calendar date of `unpublish_on`: a reminder is due from J-90 or J-30 until the expiration instant, inclusive of the whole threshold day. A missed reminder is retried before expiration; if both were missed, both are sent. The task only processes NULL markers and sets the corresponding marker after every current recipient has been sent the message. An empty recipient list, invalid path, or mail failure leaves the marker NULL and reports a task failure. Successful individual sends are recorded and are not resent on a normal retry. Each successful or failed attempt is logged with document, threshold, and user IDs in the scheduler log.
+
+Recipients are active Joomla users directly belonging to groups in the effective custom DOCman level referenced by the category's negative `access` value. Inherited custom levels work through the category's effective `access`. Joomla view levels, group hierarchy expansion, and document-specific permissions are not used. Users in multiple matching groups are deduplicated.
+
+`storage_path` must be a UNC path such as `\\server\share\agreement.pdf`. It is displayed in the email as an escaped `file://` link. Some email clients or security policies block opening local network links; recipients must have network access and a client configured to allow them.
+
+For intentional resending, clear the relevant marker **and** delete the matching document/milestone rows from `#__docman_alert_deliveries`. The delivery ledger keys on document ID, milestone and user ID; resetting a date or reusing an ID without clearing those rows will not resend to previously recorded users. As email and database commits cannot be atomic, an interruption after mail acceptance but before the database commit can cause a duplicate.
