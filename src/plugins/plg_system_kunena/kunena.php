@@ -118,6 +118,10 @@ class PlgSystemKunena extends CMSPlugin
      */
     public function onAfterInitialise()
     {
+        if ($this->app === null || $this->params === null) {
+            return;
+        }
+
         // Add ban check
         if (!$this->app->isClient('administrator') && !$this->app->isClient('api')) {
             $timestamp = time();
